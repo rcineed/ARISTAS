@@ -17,7 +17,7 @@
 #' @import dplyr
 #'
 #' @details
-#' Esta función ajusta 4 tipos de modelos:
+#' Esta función ajusta 5 tipos de modelos:
 #' * (1) Modelo de regresión con o sin pesos a nivel de estudiantes, se permite el uso de pesos réplica.
 #' * (2) Modelo de regresión con errores clusterizados con o sin pesos a nivel de estudiantes, los clusteres son a nivel de centros, , se permite el uso de pesos réplica.
 #' * (3) Modelo lineal mixto con dos niveles: nivel de estudiantes y nivel de centros usando la función 'lmer' del paquete 'lme4'.
