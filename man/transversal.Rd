@@ -20,7 +20,7 @@ transversal(
 \arguments{
 \item{data}{La base de datos que se quiere analizar, puede ser cualquiera de las bases de ARISTAS incluidas en el paquete o cualquiera otra base ARISTAS que no sea de uso público. Tenga en cuenta que las columnas que contengan los pesos replicados deben tener nombres: EST_W_REP_1, EST_W_REP_2, etc.}
 
-\item{y}{Vector de caracteres indicando el nombre de la variable de interés, ésta variable puede ser de tipo numérico o categórico.}
+\item{y}{El nombre de la variable de interés, ésta variable puede ser de tipo numérico o categórico.}
 
 \item{x}{(Opcional) Nombre de la variable numérica o categórica que define los subgrupos para la comparación.}
 
