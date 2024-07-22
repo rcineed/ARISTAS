@@ -40,7 +40,7 @@ La función \code{modelo} devuele un objeto de clase \code{lm} o \code{lmer}
 Esta función ajusta modelos lineales y mixtos para datos de ARISTAS
 }
 \details{
-Esta función ajusta 4 tipos de modelos:
+Esta función ajusta 5 tipos de modelos:
 \itemize{
 \item (1) Modelo de regresión con o sin pesos a nivel de estudiantes, se permite el uso de pesos réplica.
 \item (2) Modelo de regresión con errores clusterizados con o sin pesos a nivel de estudiantes, los clusteres son a nivel de centros, , se permite el uso de pesos réplica.

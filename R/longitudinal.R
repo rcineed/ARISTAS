@@ -1,8 +1,8 @@
 #' @title
 #' Esta función compara las diferentes ediciones de ARISTAS
 #'
-#' @param datos La base de datos que se quiere analizar, debe tener una columna llamada anio indicando a cuál edición corresponde cada fila de la base.
-#' @param y Vector de caracteres indicando el nombre de la variable de interés, ésta variable puede ser de tipo numérico o categórico.
+#' @param datos La base de datos que se quiere analizar, debe tener una columna llamada edicion indicando a cuál edición corresponde cada fila de la base.
+#' @param y El nombre de la variable de interés, ésta variable puede ser de tipo numérico o categórico.
 #' @param ediciones Vector de caracteres o números indicando cuáles son las ediciones que desea comparar.
 #' @param x (Opcional) Nombre de la variable numérica o categórica que define los subgrupos para la comparación.
 #' @param digit Especificar el número de dígitos decimales, por defecto son 3 dígitos decimales.

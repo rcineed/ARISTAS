@@ -2,7 +2,7 @@
 #' Esta función calcula las estimaciones para una edición específica de ARISTAS
 #'
 #' @param data La base de datos que se quiere analizar, puede ser cualquiera de las bases de ARISTAS incluidas en el paquete o cualquiera otra base ARISTAS que no sea de uso público. Tenga en cuenta que las columnas que contengan los pesos replicados deben tener nombres: EST_W_REP_1, EST_W_REP_2, etc.
-#' @param y Vector de caracteres indicando el nombre de la variable de interés, ésta variable puede ser de tipo numérico o categórico.
+#' @param y El nombre de la variable de interés, ésta variable puede ser de tipo numérico o categórico.
 #' @param x (Opcional) Nombre de la variable numérica o categórica que define los subgrupos para la comparación.
 #' @param limits Vector de caracteres o vector numérico. En el caso de una variable numérica `x`, se debe proveer los valores límites para definir los subgrupos.
 #' Por ejemplo, si `x` es la variable edad de los estudiantes, y se proveen los valores límites de 15 y 20, entonces se crearán tres subgrupos (intervalos): \eqn{(-\infty, 15]}, \eqn{(15, 20]} y \eqn{(20, \infty)}.

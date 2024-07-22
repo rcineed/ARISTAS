@@ -10,7 +10,7 @@ longitudinal.multiple(
   y,
   x,
   digit = 3,
-  plot = "Lollipop",
+  plot = "NULL",
   descarga = FALSE,
   archivo = NULL,
   ...

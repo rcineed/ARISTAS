@@ -74,7 +74,7 @@
 #' longitudinal.multiple(datos = ARISTAS18.22.matematicas, ediciones = c(2018, 2022), y = "Niveles_MAT", x = c("regiones", "AlumnoGenero"), digit = 2, plot = "bar", descarga = TRUE, archivo = "Niveles_MAT.xlsx", ancho = c(10,4), alto = c(6,9))
 #'
 
-longitudinal.multiple <- function(datos, ediciones, y, x, digit = 3, plot = "Lollipop", descarga = FALSE, archivo = NULL, ...) {
+longitudinal.multiple <- function(datos, ediciones, y, x, digit = 3, plot = "NULL", descarga = FALSE, archivo = NULL, ...) {
   args <- list(...)
   options(warn = -1) # Eliminar los warning que produce ggplot
 

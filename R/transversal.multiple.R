@@ -2,7 +2,7 @@
 #' Esta función calcula las estimaciones de una variable de interés para una edición específica de ARISTAS para más de una variable de corte
 #'
 #' @param data La base de datos que se quiere analizar, puede ser cualquiera de las bases de ARISTAS incluidas en el paquete o cualquiera otra base ARISTAS que no sea de uso público. Tenga en cuenta que las columnas que contengan los pesos replicados deben tener nombres: EST_W_REP_1, EST_W_REP_2, etc.
-#' @param y Vector de caracteres indicando el nombre de la variable de interés, ésta variable puede ser de tipo numérico o categórico.
+#' @param y El nombre de la variable de interés, ésta variable puede ser de tipo numérico o categórico.
 #' @param x Vector de caracteres indicando el nombre de las variables de corte.
 #' @param digit Especificar el número de dígitos decimales, por defecto son 3 dígitos decimales.
 #' @param IC Indicar si se muestran las estimaciones e intervalos de confianza sobre la gráfica.

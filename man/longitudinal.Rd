@@ -17,11 +17,11 @@ longitudinal(
 )
 }
 \arguments{
-\item{datos}{La base de datos que se quiere analizar, debe tener una columna llamada anio indicando a cuál edición corresponde cada fila de la base.}
+\item{datos}{La base de datos que se quiere analizar, debe tener una columna llamada edicion indicando a cuál edición corresponde cada fila de la base.}
 
 \item{ediciones}{Vector de caracteres o números indicando cuáles son las ediciones que desea comparar.}
 
-\item{y}{Vector de caracteres indicando el nombre de la variable de interés, ésta variable puede ser de tipo numérico o categórico.}
+\item{y}{El nombre de la variable de interés, ésta variable puede ser de tipo numérico o categórico.}
 
 \item{x}{(Opcional) Nombre de la variable numérica o categórica que define los subgrupos para la comparación.}
 
