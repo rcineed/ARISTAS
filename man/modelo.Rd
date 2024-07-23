@@ -11,8 +11,7 @@ modelo(
   pesos = NULL,
   pesos.rep = NULL,
   pesos.centro = NULL,
-  cluster_var = NULL,
-  random_formula = NULL
+  cluster_var = NULL
 )
 }
 \arguments{
@@ -23,15 +22,13 @@ modelo(
 \item{tipo}{Especificar el tipo de modelo que se estimará, \code{lm} para un modelo de regresión, \code{lm_error_cluster} para un modelo de regresión con errores clusterizados,
 \code{linear_mixed} para un modelo mixto de dos niveles donde solo se permite pesos en el primer nivel y \code{linear_mixed_weight_2} para un modelo mixto de dos niveles permitiendo pesos en ambos niveles.}
 
-\item{pesos}{Un vector de pesos o ponderadores para el nivel de estudiantes.}
+\item{pesos}{Especificar el tipo de modelo que se estimará, \code{lm} para un modelo de regresión, \code{lm_error_cluster} para un modelo de regresión con errores clusterizados, \code{linear_mixed} parea un modelo multinivel con pesos en el nivel de estudiantes, \code{linear_mixed_weight_2} para un modelo multinivel con pesos en el nivel de estudiantes y a nivel de centros, y \code{logit} para un modelo de regresión logística con pesos en el nivel de estudiantes.}
 
 \item{pesos.rep}{Pesos réplica para el nivel de estudiantes.}
 
 \item{pesos.centro}{Un vector de pesos o ponderadores para el nivel de centros.}
 
-\item{cluster_var}{La variable que indica los clusters para el modelo lineal con errores clusterizados o para indicar los centros (segundo nivel)}
-
-\item{random_formula}{La fórmula para especificar los efectos aleatorios del modelo mixto.}
+\item{cluster_var}{La variable que indica los clusters para todos los modelos que consideren dos niveles}
 }
 \value{
 La función \code{modelo} devuele un objeto de clase \code{lm} o \code{lmer}
@@ -43,17 +40,16 @@ Esta función ajusta modelos lineales y mixtos para datos de ARISTAS
 Esta función ajusta 5 tipos de modelos:
 \itemize{
 \item (1) Modelo de regresión con o sin pesos a nivel de estudiantes, se permite el uso de pesos réplica.
-\item (2) Modelo de regresión con errores clusterizados con o sin pesos a nivel de estudiantes, los clusteres son a nivel de centros, , se permite el uso de pesos réplica.
+\item (2) Modelo de regresión con errores clusterizados con o sin pesos a nivel de estudiantes, los clusteres son a nivel de centros, se permite el uso de pesos réplica.
 \item (3) Modelo lineal mixto con dos niveles: nivel de estudiantes y nivel de centros usando la función 'lmer' del paquete 'lme4'.
-Solo se permite ingresar ponderadores para el primer nivel (el nivel de estudiantes), que puede ser un vector de ponderadores o los pesos réplica con el método de BRR.
-Cuando se ingresan los pesos réplica se debe también ingresar el vector de pesos. Y la metodología para calcular los errores estándares de las estimaciones consistenten en:
-\item (i) Para el vector de pesos, ajustar el modelo mixto y se denota el parámetro de interés (coeficiente de regresión) con \eqn{\hat{\beta}},
-\item (ii) Para cada conjunto de pesos de los pesos réplica, ajustar el modelo mixto y el parámetro de interés correspondiente se denota por \eqn{\hat{\beta}_k} para \eqn{k=1,\cdots,K}, donde \eqn{K} denota el vector de pesos réplica.
-\item (iii) El error estándar de la estimación se calcula como \deqn{\sqrt{\dfrac{\sum_{i=1}^K(\hat{\beta}_k-\hat{\beta})^2}{K}}}
+Solo se permite ingresar ponderadores para el primer nivel (el nivel de estudiantes), que puede ser un vector de ponderadores con o sin los pesos réplica con el método de BRR.
 \item (4) Modelo lineal mixto con dos niveles: nivel de estudiantes y nivel de centros usando la función 'mix' del paquete 'WeMix'.
-No se permiten ponderadores réplica en ningún nivel.
-\item (5) Modelo mixto logística con dos niveles: nivel de estudiantes y nivel de centro usando la función 'glmer' del paquete 'lme4' con o sin pesos a nivel de estudiantes, se permite pesos réplica. Cuando se ingresan los pesos réplica se debe también ingresar el vector de pesos.
-La forma de calcular los errores estándares es análogo al modelo (3).
+No se permiten pesos réplica en ningún nivel.
+\item (5) Modelo mixto logística con dos niveles: nivel de estudiantes y nivel de centro usando la función 'glmer' del paquete 'lme4' con o sin pesos a nivel de estudiantes.
+Para los modelos (2) y (3) cuando se ingresan los pesos réplica se debe también ingresar el vector de pesos. Y la metodología para calcular los errores estándares de las estimaciones consistenten en:
+\item (i) Para el vector de pesos, ajustar el modelo correspondiente y se denota el parámetro de interés (coeficiente de regresión) con \eqn{\hat{\beta}},
+\item (ii) Para cada conjunto de pesos de los pesos réplica, ajustar el modelo correspondiente y el parámetro de interés correspondiente se denota por \eqn{\hat{\beta}_k} para \eqn{k=1,\cdots,K}, donde \eqn{K} denota el vector de pesos réplica.
+\item (iii) El error estándar de la estimación se calcula como \deqn{\sqrt{\dfrac{\sum_{i=1}^K(\hat{\beta}_k-\hat{\beta})^2}{K}}}
 }
 }
 \examples{
@@ -104,31 +100,32 @@ datos1 <- ARISTAS22.matematicas.modelo |>
   dplyr::left_join(ARISTAS22.contexto.modelo,
             by = "AlumnoCodigoDes")
 
+# Definir la formula del modelo de los efectos fijos
+formula.fija <- theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8
+
 # Modelo 1: Ajustar un modelo de regresión lineal con y sin pesos de estudiantes
-modelo(base = datos1, theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8, tipo = "lm")
-modelo(base = datos1, theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8, tipo = "lm", pesos = "peso_MEst")
-modelo(base = datos1, theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8, tipo = "lm", pesos.rep = paste0("EST_W_REP_", 1:160))
+modelo(base = datos1, formula.fija, tipo = "lm")
+modelo(base = datos1, formula.fija, tipo = "lm", pesos = "peso_MEst")
+modelo(base = datos1, formula.fija, tipo = "lm", pesos = "peso_MEst", pesos.rep = paste0("EST_W_REP_", 1:160))
 
 # Modelo 2: Ajustar un modelo de regresión con error clusterizado con y sin pesos de estudiantes
-modelo(base = datos1, theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8, tipo = "lm_error_cluster", cluster_var = "CentroCodigoDes")
-modelo(base = datos1, theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8, tipo = "lm_error_cluster", cluster_var = "CentroCodigoDes", pesos = "peso_MEst")
-modelo(base = datos1, theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8, tipo = "lm_error_cluster", cluster_var = "CentroCodigoDes", pesos = "peso_MEst", pesos.rep = paste0("EST_W_REP_", 1:160))
+modelo(base = datos1, formula.fija, tipo = "lm_error_cluster", cluster_var = "CentroCodigoDes")
+modelo(base = datos1, formula.fija, tipo = "lm_error_cluster", cluster_var = "CentroCodigoDes", pesos = "peso_MEst")
+modelo(base = datos1, formula.fija, tipo = "lm_error_cluster", cluster_var = "CentroCodigoDes", pesos = "peso_MEst", pesos.rep = paste0("EST_W_REP_", 1:160))
 
-formula.fija <- theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8
 # Modelo 3: Ajustar un modelo mixto sin pesos
-modelo(base = datos1, formula.fija, tipo = "linear_mixed", cluster_var = "CentroCodigoDes", random_formula = ~ 1)
+modelo(base = datos1, formula.fija, tipo = "linear_mixed", cluster_var = "CentroCodigoDes")
 # Ajustar un modelo mixto con pesos de los estudiantes
-modelo(base = datos1, formula.fija, tipo = "linear_mixed", cluster_var = "CentroCodigoDes", random_formula = ~ 1, pesos = "peso_MEst")
+modelo(base = datos1, formula.fija, tipo = "linear_mixed", cluster_var = "CentroCodigoDes", pesos = "peso_MEst")
 # Ajustar un modelo mixto con pesos y pesos réplica de los estudiantes
-modelo(base = datos1, formula.fija, tipo = "linear_mixed", cluster_var = "CentroCodigoDes", random_formula = ~ 1, pesos = "peso_MEst", pesos.rep = paste0("EST_W_REP_", 1:160))
+modelo(base = datos1, formula.fija, tipo = "linear_mixed", cluster_var = "CentroCodigoDes", pesos = "peso_MEst", pesos.rep = paste0("EST_W_REP_", 1:160))
 
 # Modelo 4: Ajustar un modelo mixto con pesos de estudiantes y pesos de centros
-formula.mixto <- theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8 + (1|CentroCodigoDes)
-modelo(base = datos1, formula.mixto, tipo = "linear_mixed_weight_2", pesos = "peso_MEst", pesos.centro = "peso_CENTRO")
+modelo(base = datos1, formula.fija, tipo = "linear_mixed_weight_2", pesos = "peso_MEst", pesos.centro = "peso_CENTRO", cluster_var = "CentroCodigoDes")
 
 # Modelo 5: Ajustar un modelo mixto logit con variable dependiente nivel de desempeño igual o superior a dos, vs. nivel de desempeño menor a dos
 datos1 <- datos1 |> dplyr::mutate(nivel_dos= Niveles_MAT == "B1" | Niveles_MAT == "N1")
-formula.mixto.logit <- nivel_dos ~ EDAD + EF1m  +  (1|CentroCodigoDes)
-modelo(base = datos1, formula = formula.mixto.logit, tipo = "logit", pesos = "peso_MEst")
+formula.fija.logit <- nivel_dos ~ EDAD + EF1m
+modelo(base = datos1, formula = formula.fija.logit, tipo = "logit", pesos = "peso_MEst", cluster_var = "CentroCodigoDes")
 
 }

@@ -4,11 +4,10 @@
 #' @param formula La fórmula para especificar (i) el modelo para un modelo de regresión o un modelo con errores clusterizados, (ii) el modelo de los efectos fijos en un modelo mixto.
 #' @param tipo Especificar el tipo de modelo que se estimará, `lm` para un modelo de regresión, `lm_error_cluster` para un modelo de regresión con errores clusterizados,
 #' `linear_mixed` para un modelo mixto de dos niveles donde solo se permite pesos en el primer nivel y `linear_mixed_weight_2` para un modelo mixto de dos niveles permitiendo pesos en ambos niveles.
-#' @param pesos Un vector de pesos o ponderadores para el nivel de estudiantes.
+#' @param pesos Especificar el tipo de modelo que se estimará, `lm` para un modelo de regresión, `lm_error_cluster` para un modelo de regresión con errores clusterizados, `linear_mixed` parea un modelo multinivel con pesos en el nivel de estudiantes, `linear_mixed_weight_2` para un modelo multinivel con pesos en el nivel de estudiantes y a nivel de centros, y `logit` para un modelo de regresión logística con pesos en el nivel de estudiantes.
 #' @param pesos.rep Pesos réplica para el nivel de estudiantes.
 #' @param pesos.centro Un vector de pesos o ponderadores para el nivel de centros.
-#' @param cluster_var La variable que indica los clusters para el modelo lineal con errores clusterizados o para indicar los centros (segundo nivel)
-#' @param random_formula La fórmula para especificar los efectos aleatorios del modelo mixto.
+#' @param cluster_var La variable que indica los clusters para todos los modelos que consideren dos niveles
 #'
 #' @return
 #' La función `modelo` devuele un objeto de clase `lm` o `lmer`
@@ -19,18 +18,16 @@
 #' @details
 #' Esta función ajusta 5 tipos de modelos:
 #' * (1) Modelo de regresión con o sin pesos a nivel de estudiantes, se permite el uso de pesos réplica.
-#' * (2) Modelo de regresión con errores clusterizados con o sin pesos a nivel de estudiantes, los clusteres son a nivel de centros, , se permite el uso de pesos réplica.
+#' * (2) Modelo de regresión con errores clusterizados con o sin pesos a nivel de estudiantes, los clusteres son a nivel de centros, se permite el uso de pesos réplica.
 #' * (3) Modelo lineal mixto con dos niveles: nivel de estudiantes y nivel de centros usando la función 'lmer' del paquete 'lme4'.
-#' Solo se permite ingresar ponderadores para el primer nivel (el nivel de estudiantes), que puede ser un vector de ponderadores o los pesos réplica con el método de BRR.
-#' Cuando se ingresan los pesos réplica se debe también ingresar el vector de pesos. Y la metodología para calcular los errores estándares de las estimaciones consistenten en:
-#' *  (i) Para el vector de pesos, ajustar el modelo mixto y se denota el parámetro de interés (coeficiente de regresión) con \eqn{\hat{\beta}},
-#' *  (ii) Para cada conjunto de pesos de los pesos réplica, ajustar el modelo mixto y el parámetro de interés correspondiente se denota por \eqn{\hat{\beta}_k} para \eqn{k=1,\cdots,K}, donde \eqn{K} denota el vector de pesos réplica.
-#' *  (iii) El error estándar de la estimación se calcula como \deqn{\sqrt{\dfrac{\sum_{i=1}^K(\hat{\beta}_k-\hat{\beta})^2}{K}}}
+#' Solo se permite ingresar ponderadores para el primer nivel (el nivel de estudiantes), que puede ser un vector de ponderadores con o sin los pesos réplica con el método de BRR.
 #' *  (4) Modelo lineal mixto con dos niveles: nivel de estudiantes y nivel de centros usando la función 'mix' del paquete 'WeMix'.
-#' No se permiten ponderadores réplica en ningún nivel.
-#' *  (5) Modelo mixto logística con dos niveles: nivel de estudiantes y nivel de centro usando la función 'glmer' del paquete 'lme4' con o sin pesos a nivel de estudiantes, se permite pesos réplica. Cuando se ingresan los pesos réplica se debe también ingresar el vector de pesos.
-#' La forma de calcular los errores estándares es análogo al modelo (3).
-#'
+#' No se permiten pesos réplica en ningún nivel.
+#' *  (5) Modelo mixto logística con dos niveles: nivel de estudiantes y nivel de centro usando la función 'glmer' del paquete 'lme4' con o sin pesos a nivel de estudiantes.
+#' Para los modelos (2) y (3) cuando se ingresan los pesos réplica se debe también ingresar el vector de pesos. Y la metodología para calcular los errores estándares de las estimaciones consistenten en:
+#' *  (i) Para el vector de pesos, ajustar el modelo correspondiente y se denota el parámetro de interés (coeficiente de regresión) con \eqn{\hat{\beta}},
+#' *  (ii) Para cada conjunto de pesos de los pesos réplica, ajustar el modelo correspondiente y el parámetro de interés correspondiente se denota por \eqn{\hat{\beta}_k} para \eqn{k=1,\cdots,K}, donde \eqn{K} denota el vector de pesos réplica.
+#' *  (iii) El error estándar de la estimación se calcula como \deqn{\sqrt{\dfrac{\sum_{i=1}^K(\hat{\beta}_k-\hat{\beta})^2}{K}}}
 #' @export
 #'
 #' @examples
@@ -81,35 +78,36 @@
 #'   dplyr::left_join(ARISTAS22.contexto.modelo,
 #'             by = "AlumnoCodigoDes")
 #'
+#' # Definir la formula del modelo de los efectos fijos
+#' formula.fija <- theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8
+#'
 #' # Modelo 1: Ajustar un modelo de regresión lineal con y sin pesos de estudiantes
-#' modelo(base = datos1, theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8, tipo = "lm")
-#' modelo(base = datos1, theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8, tipo = "lm", pesos = "peso_MEst")
-#' modelo(base = datos1, theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8, tipo = "lm", pesos.rep = paste0("EST_W_REP_", 1:160))
+#' modelo(base = datos1, formula.fija, tipo = "lm")
+#' modelo(base = datos1, formula.fija, tipo = "lm", pesos = "peso_MEst")
+#' modelo(base = datos1, formula.fija, tipo = "lm", pesos = "peso_MEst", pesos.rep = paste0("EST_W_REP_", 1:160))
 #'
 #' # Modelo 2: Ajustar un modelo de regresión con error clusterizado con y sin pesos de estudiantes
-#' modelo(base = datos1, theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8, tipo = "lm_error_cluster", cluster_var = "CentroCodigoDes")
-#' modelo(base = datos1, theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8, tipo = "lm_error_cluster", cluster_var = "CentroCodigoDes", pesos = "peso_MEst")
-#' modelo(base = datos1, theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8, tipo = "lm_error_cluster", cluster_var = "CentroCodigoDes", pesos = "peso_MEst", pesos.rep = paste0("EST_W_REP_", 1:160))
+#' modelo(base = datos1, formula.fija, tipo = "lm_error_cluster", cluster_var = "CentroCodigoDes")
+#' modelo(base = datos1, formula.fija, tipo = "lm_error_cluster", cluster_var = "CentroCodigoDes", pesos = "peso_MEst")
+#' modelo(base = datos1, formula.fija, tipo = "lm_error_cluster", cluster_var = "CentroCodigoDes", pesos = "peso_MEst", pesos.rep = paste0("EST_W_REP_", 1:160))
 #'
-#' formula.fija <- theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8
 #' # Modelo 3: Ajustar un modelo mixto sin pesos
-#' modelo(base = datos1, formula.fija, tipo = "linear_mixed", cluster_var = "CentroCodigoDes", random_formula = ~ 1)
+#' modelo(base = datos1, formula.fija, tipo = "linear_mixed", cluster_var = "CentroCodigoDes")
 #' # Ajustar un modelo mixto con pesos de los estudiantes
-#' modelo(base = datos1, formula.fija, tipo = "linear_mixed", cluster_var = "CentroCodigoDes", random_formula = ~ 1, pesos = "peso_MEst")
+#' modelo(base = datos1, formula.fija, tipo = "linear_mixed", cluster_var = "CentroCodigoDes", pesos = "peso_MEst")
 #' # Ajustar un modelo mixto con pesos y pesos réplica de los estudiantes
-#' modelo(base = datos1, formula.fija, tipo = "linear_mixed", cluster_var = "CentroCodigoDes", random_formula = ~ 1, pesos = "peso_MEst", pesos.rep = paste0("EST_W_REP_", 1:160))
+#' modelo(base = datos1, formula.fija, tipo = "linear_mixed", cluster_var = "CentroCodigoDes", pesos = "peso_MEst", pesos.rep = paste0("EST_W_REP_", 1:160))
 #'
 #' # Modelo 4: Ajustar un modelo mixto con pesos de estudiantes y pesos de centros
-#' formula.mixto <- theta_MAT_300_50 ~ EDAD + EF1m + EF2d + EF7_1 + EF7_2 + EF8_2 + EF9_2 + EF9_3 + EF9_4 + EF9_5 + EF9_6 + EF9_8 + (1|CentroCodigoDes)
-#' modelo(base = datos1, formula.mixto, tipo = "linear_mixed_weight_2", pesos = "peso_MEst", pesos.centro = "peso_CENTRO")
+#' modelo(base = datos1, formula.fija, tipo = "linear_mixed_weight_2", pesos = "peso_MEst", pesos.centro = "peso_CENTRO", cluster_var = "CentroCodigoDes")
 #'
 #' # Modelo 5: Ajustar un modelo mixto logit con variable dependiente nivel de desempeño igual o superior a dos, vs. nivel de desempeño menor a dos
 #' datos1 <- datos1 |> dplyr::mutate(nivel_dos= Niveles_MAT == "B1" | Niveles_MAT == "N1")
-#' formula.mixto.logit <- nivel_dos ~ EDAD + EF1m  +  (1|CentroCodigoDes)
-#' modelo(base = datos1, formula = formula.mixto.logit, tipo = "logit", pesos = "peso_MEst")
+#' formula.fija.logit <- nivel_dos ~ EDAD + EF1m
+#' modelo(base = datos1, formula = formula.fija.logit, tipo = "logit", pesos = "peso_MEst", cluster_var = "CentroCodigoDes")
 #'
 
-modelo <- function(base, formula, tipo, pesos = NULL, pesos.rep = NULL, pesos.centro = NULL, cluster_var = NULL, random_formula = NULL) {
+modelo <- function(base, formula, tipo, pesos = NULL, pesos.rep = NULL, pesos.centro = NULL, cluster_var = NULL) {
 
   #----------------------------------------------------------------------------------
   # Modelo 1: modelo lineal de un solo nivel
@@ -122,16 +120,15 @@ modelo <- function(base, formula, tipo, pesos = NULL, pesos.rep = NULL, pesos.ce
       base[["pesos.lm"]] <-  base[[pesos]]
       model <- lm(formula, data = base, weights = pesos.lm)
     }
-    if(!is.null(pesos.rep) & is.null(pesos)){ # sí hay peso réplica, no hay peso
-      dis = survey::svrepdesign(data=base, type="Fay", weights=~peso_MEst,
+    if(!is.null(pesos.rep) & !is.null(pesos)){ # sí hay ambos tipos de pesos
+      base[["pesos.lm"]] <-  base[[pesos]]
+      dis = survey::svrepdesign(data=base, type="Fay", weights=~pesos.lm,
                                 repweights=paste0("EST_W_REP_[", 1, "-", length(pesos.rep), "]"),
                                 combined.weights=TRUE, rho = 1.5, mse = F)
       model <- survey::svyglm(formula, design=dis, family=gaussian())
     }
-    if(!is.null(pesos) & !is.null(pesos.rep)) { # sí hay pesos y peso peso réplica, omite peso réplica
-      print("Se omiten los pesos réplica y se usarán los pesos para ajustar el modelo de regresión.")
-      base[["pesos.lm"]] <-  base[[pesos]]
-      model <- lm(formula, data = base, weights = pesos.lm)
+    if(is.null(pesos) & !is.null(pesos.rep)) { # si no hay pesos pero sí hay pesos réplica, pedir al usuario ingresar los pesos
+      stop("Falta ingresar los pesos de estudiantes en el argumento pesos.")
     }
 
   }
@@ -141,7 +138,7 @@ modelo <- function(base, formula, tipo, pesos = NULL, pesos.rep = NULL, pesos.ce
   #----------------------------------------------------------------------------------
   if (tipo == "lm_error_cluster") {
     if(is.null(cluster_var)) {
-      stop("For clustered standard errors, you must provide a cluster variable")
+      stop("Se debe proveer una variable que indique los clusters.")
     }
     if(is.null(pesos) & is.null(pesos.rep)) {
       model <- estimatr::lm_robust(formula, data = base, clusters = base[[cluster_var]])
@@ -157,7 +154,7 @@ modelo <- function(base, formula, tipo, pesos = NULL, pesos.rep = NULL, pesos.ce
       base[["pesos.lm.robust"]] <-  base[[pesos]]
       model <- estimatr::lm_robust(formula, data = base, clusters = base[[cluster_var]], weights = pesos.lm.robust)
       theta <- summary(model)$coefficients[,1] # El vector de coeficientes estimados con los pesos de estudiantes
-      p <- length(theta)  # Número de parámetros
+        p <- length(theta)  # Número de parámetros
         n.rep <- length(pesos.rep)
         theta.est.result <- matrix(NA, p, n.rep)
         for(k in 1:n.rep){
@@ -171,8 +168,8 @@ modelo <- function(base, formula, tipo, pesos = NULL, pesos.rep = NULL, pesos.ce
                                    s.e. = sd.brr,
                                    valor.t = valor.t)
         print(coeficientes)
+        model = NULL
     }
-    model = NULL
     # model$coefficients.complete <- coef(summary(lm(formula, data = base), vcov = vcovCL(model, cluster = base[[cluster_var]])))
   }
 
@@ -213,9 +210,10 @@ modelo <- function(base, formula, tipo, pesos = NULL, pesos.rep = NULL, pesos.ce
   }
 
   #------------------------------------------------------------------------------------------
-  # Modelo 4: modelo multinivel con pesos en el primer y pesos en el segundo nivel
+  # Modelo 4: modelo multinivel con pesos en ambos niveles
   #------------------------------------------------------------------------------------------
   if (tipo == "linear_mixed_weight_2") {
+    formula.lmer <- as.formula(paste(deparse(formula, width.cutoff = 500), paste(" + (1|", cluster_var, ")", collapse = ""), sep = " "))
     if(is.null(pesos.centro)){
       stop("Falta ingresar los pesos de los centros en el argumento pesos.centro")
     }
@@ -225,22 +223,23 @@ modelo <- function(base, formula, tipo, pesos = NULL, pesos.rep = NULL, pesos.ce
     if(!is.null(pesos) & !is.null(pesos.centro)){
       base[["pesos.estudiantes"]] <-  base[[pesos]]
       base[["pesos.centro"]] <-  base[[pesos.centro]]
-      model <- WeMix::mix(formula, data=base, weights=c("pesos.estudiantes", "pesos.centro"))
+      model <- WeMix::mix(formula.lmer, data=base, weights=c("pesos.estudiantes", "pesos.centro"))
     }
   }
   #------------------------------------------------------------------------------------------
-  # Modelo 5: modelo regresión logística con pesos en el primer y pesos en el segundo nivel
+  # Modelo 5: modelo regresión logística con pesos en el primer nivel
   #------------------------------------------------------------------------------------------
   if(tipo == "logit"){
+    formula.lmer <- as.formula(paste(deparse(formula, width.cutoff = 500), paste(" + (1|", cluster_var, ")", collapse = ""), sep = " "))
     if(is.null(pesos)){
-      stop("Falta ingresar los pesos de los estudiantes en el argumento pesos")
+      model <- lme4::glmer(formula.lmer, data = base, family = binomial)
     }
     if(!is.null(pesos)){
       if(!is.null(pesos.rep)){
         print("Se omiten los pesos réplica y se usarán los pesos para ajustar el modelo de regresión.")
       }
       base[["pesos.estudiantes"]] <-  base[[pesos]]
-      model <- lme4::glmer(formula, data = base, weights = base[["pesos.estudiantes"]], family = binomial)
+      model <- lme4::glmer(formula.lmer, data = base, weights = base[["pesos.estudiantes"]], family = binomial)
     }
   }
   return(model)
